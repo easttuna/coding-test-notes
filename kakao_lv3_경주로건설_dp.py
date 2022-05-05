@@ -20,25 +20,26 @@ def solution(board):
 
     while queue:
         cur_loc = queue.popleft()
-
         for direction, (dy,dx) in MOVES.items():  # 4방향 움직임 시도
             new_loc = (cur_loc[0] + dy , cur_loc[1] + dx)
-
-            if new_loc[0] not in range(0, size) or new_loc[1] not in range(0,size) or board[new_loc[0]][new_loc[1]] == 1:
+            # 새로운 location이 보드 범위를 벗어나거나 벽인 경우 넘어감
+            if new_loc[0] not in range(0, size) or  \
+                new_loc[1] not in range(0,size) or  \
+                    board[new_loc[0]][new_loc[1]] == 1:
                 continue
 
-            pre_directions = [d for d in dp[cur_loc[0]][cur_loc[1]].keys()]
-
+            pre_directions = [d for d in dp[cur_loc[0]][cur_loc[1]].keys()]  # 기존 위치에 존재하는 방향들
             temp = []
             for pre_d in pre_directions:
-                pre_price = dp[cur_loc[0]][cur_loc[1]][pre_d]
-                if GROUP[pre_d] == GROUP[direction]:
+                pre_price = dp[cur_loc[0]][cur_loc[1]][pre_d]  # 방향에 따른 가격을 가져옴
+                if GROUP[pre_d] == GROUP[direction]:  # 같은 그룹의 방향일 시 100원 추가
                     new_price = pre_price + 100
-                else:
+                else:  # 다른 그룹의 방향일 시 600원 추가
                     new_price = pre_price + 600
                 temp.append(new_price)
-            opt_price = min(temp)
+            opt_price = min(temp)  # 최적의 가격만 저장
 
+            # 위에서 구한 최적 가격이 기존 최적보다 낮으면 업데이트 (처음이어도 업데이트.)
             try:
                 if opt_price < dp[new_loc[0]][new_loc[1]][direction]:
                     queue.append(new_loc)
@@ -47,7 +48,7 @@ def solution(board):
                 queue.append(new_loc)
                 dp[new_loc[0]][new_loc[1]][direction] = opt_price
 
-    answer = min(dp[max_idx][max_idx].values())
+    answer = min(dp[max_idx][max_idx].values())  # 종점 좌표로 각 방향에서 온 가격중 최소값을 최종 정답으로 선택
     return answer
 
 case = [[0,0,0],[0,0,0],[0,0,0]]
